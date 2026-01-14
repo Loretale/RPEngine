@@ -1,0 +1,22 @@
+{
+    "Group": "Example",
+    "Name": "ExamplePlugin",
+    "Version": "0.0.1",
+    "Description": "An plugin for the Loretale server!",
+    "Authors": [
+        {
+            "Name": "Muse"
+        }
+    ],
+    "Website": "loretale.net",
+    "ServerVersion": "*",
+    "Dependencies": {
+        
+    },
+    "OptionalDependencies": {
+        
+    },
+    "DisabledByDefault": false,
+    "Main": "net.loretale.plugin.ExamplePlugin",
+    "IncludesAssetPack": false
+}
