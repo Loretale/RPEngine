@@ -1,8 +1,8 @@
 {
-    "Group": "Example",
-    "Name": "ExamplePlugin",
+    "Group": "net.loretale",
+    "Name": "RPEngine",
     "Version": "0.0.1",
-    "Description": "An plugin for the Loretale server!",
+    "Description": "The core plugin for the Loretale server",
     "Authors": [
         {
             "Name": "Muse"
@@ -17,6 +17,6 @@
         
     },
     "DisabledByDefault": false,
-    "Main": "net.loretale.plugin.ExamplePlugin",
+    "Main": "net.loretale.rpengine.RPEngine",
     "IncludesAssetPack": false
 }
