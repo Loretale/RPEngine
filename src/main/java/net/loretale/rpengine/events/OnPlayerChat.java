@@ -12,6 +12,8 @@ import net.loretale.rpengine.model.PlayerState;
 import net.loretale.rpengine.repositories.PlayerStateRepository;
 
 import java.awt.*;
+import java.nio.channels.Channel;
+import java.util.Arrays;
 import java.util.UUID;
 
 public class OnPlayerChat {
@@ -41,8 +43,41 @@ public class OnPlayerChat {
             return;
         }
 
-
         ChatChannel channel = state.getFocusedChannel();
+
+        if (content.startsWith("#")) {
+            content = content.substring(1).trim();
+
+            String[] parts = content.split("\\s");
+
+            ChatChannel newChannel;
+
+            try {
+                newChannel = ChatChannel.valueOf(parts[0].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage(
+                        Message.raw("Unknown chat channel.")
+                                .color(Color.RED)
+                );
+                return;
+            }
+
+            if (parts.length > 1) {
+                channel = newChannel;
+                content = String.join(" ", Arrays.copyOfRange(parts, 1, parts.length));
+            } else {
+                state.setFocusedChannel(newChannel);
+
+                sender.sendMessage(
+                        Message.join(
+                                Message.raw("Switched to "),
+                                newChannel.prefix,
+                                Message.raw(".")
+                        ));
+                return;
+            }
+        }
+
         String displayName = channel.isRoleplayChannel
                 ? character.name
                 : sender.getUsername();
@@ -50,14 +85,38 @@ public class OnPlayerChat {
         Message message;
 
         if (channel.isRoleplayChannel) {
-            // Parse roleplay, get color, etc
-            message = Message.join(
-                    channel.prefix,
-                    Message.raw(" "),
-                    Message.raw(displayName + ": ").color(Color.GRAY),
-                    parseRoleplayMessage(content, character.chatColor)
-            );
+            if (content.startsWith("**")) {
+                content = content.substring(2).trim();
 
+                message = Message.join(
+                        channel.prefix,
+                        Message.raw(" "),
+                        parseRoleplayMessage("[!] " + content, character.chatColor)
+                );
+            } else if (content.startsWith("*")) {
+                content = content.substring(1).trim();
+
+                if (content.startsWith("'")) {
+                    message = Message.join(
+                            channel.prefix,
+                            Message.raw(" "),
+                            parseRoleplayMessage(character.name + content, character.chatColor)
+                    );
+                } else {
+                    message = Message.join(
+                            channel.prefix,
+                            Message.raw(" "),
+                            parseRoleplayMessage(character.name + " " + content, character.chatColor)
+                    );
+                }
+            } else {
+                message = Message.join(
+                        channel.prefix,
+                        Message.raw(" "),
+                        Message.raw(displayName + ": ").color(Color.GRAY),
+                        parseRoleplayMessage(content, character.chatColor)
+                );
+            }
         } else {
             message = Message.join(
                     channel.prefix,
