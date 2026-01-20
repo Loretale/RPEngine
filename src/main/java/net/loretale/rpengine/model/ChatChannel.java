@@ -10,7 +10,7 @@ public enum ChatChannel {
     Q(8, Message.raw("[Q]").color("#67c4c7"), true, false, false),
     QOOC(8, Message.raw("[QOOC]").color("#67c4c7"), false, false, false),
     RP(20, Message.raw("[RP]").color("#167500"), true, false, false),
-    LOOC(20, Message.raw("[LOOC]").color(Color.GRAY), false, false, false),
+    LOOC(20, Message.raw("[LOOC]").color("#167500"), false, false, false),
     S(40, Message.raw("[S]").color("#ba1e1e"), true, false, false),
     SOOC(40, Message.raw("[SOOC]").color("#ba1e1e"), false, false, false),
     LEB(100, Message.raw("[EVENT]").color("#b5b200"), true, false, true),

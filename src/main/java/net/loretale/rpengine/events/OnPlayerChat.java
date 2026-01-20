@@ -45,6 +45,42 @@ public class OnPlayerChat {
 
         ChatChannel channel = state.getFocusedChannel();
 
+        if (content.startsWith("#-")) {
+            content = content.substring(2).trim();
+
+            String[] parts = content.split("\\s");
+
+            ChatChannel newChannel;
+
+            try {
+                newChannel = ChatChannel.valueOf(parts[0].toUpperCase());
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage(
+                        Message.raw("Unknown chat channel.")
+                                .color(Color.RED)
+                );
+                return;
+            }
+
+            if (newChannel.canLeave) {
+                state.leaveChannel(newChannel);
+                sender.sendMessage(
+                        Message.join(
+                                Message.raw("Left "),
+                                newChannel.prefix,
+                                Message.raw(".")
+                        ));
+            } else {
+                sender.sendMessage(
+                        Message.join(
+                                Message.raw("Can't leave "),
+                                newChannel.prefix,
+                                Message.raw(".")
+                        ));
+            }
+            return;
+        }
+
         if (content.startsWith("#")) {
             content = content.substring(1).trim();
 
@@ -60,6 +96,16 @@ public class OnPlayerChat {
                                 .color(Color.RED)
                 );
                 return;
+            }
+
+            if (!state.isInChannel(newChannel)) {
+                state.joinChannel(newChannel);
+                sender.sendMessage(
+                        Message.join(
+                                Message.raw("Joined "),
+                                newChannel.prefix,
+                                Message.raw(".")
+                        ));
             }
 
             if (parts.length > 1) {
