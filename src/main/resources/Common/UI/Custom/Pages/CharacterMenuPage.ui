@@ -1,0 +1,53 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Center;
+
+  Group #CharacterMenuPanel {
+    Anchor: (Width: 800, Height: 500);
+    LayoutMode: Top;
+    Padding: (Full: 20);
+    Background: #141c26;
+
+    Label #Title {
+      Text: "Character Menu";
+      Anchor: (Height: 40);
+      Style: (
+        FontSize: 28,
+        RenderBold: true,
+        HorizontalAlignment: Center,
+        VerticalAlignment: Center,
+        TextColor: #ffffff
+      );
+    }
+
+    $C.@ContentSeparator {
+      Anchor: (Height: 1);
+    }
+
+    Group #CharacterList {
+      LayoutMode: TopScrolling;
+      Anchor: (Height: 360);
+      Padding: (Full: 8);
+      Background: #0e1621;
+    }
+
+    Group {
+      LayoutMode: Center;
+      Anchor: (Height: 44);
+      Padding: (Top: 20);
+
+      $C.@TextButton #CreateBtn {
+        @Text = "Create";
+        Anchor: (Width: 160, Height: 44);
+      }
+
+      Group { Anchor: (Width: 12); }
+
+      $C.@CancelTextButton #CloseBtn {
+        @Text = "Close";
+        Anchor: (Width: 160, Height: 44);
+      }
+    }
+  }
+}

@@ -1,0 +1,89 @@
+$C = "../Common.ui";
+
+Group {
+  LayoutMode: Center;
+
+  Group #EditPanel {
+    Anchor: (Width: 600, Height: 420);
+    LayoutMode: Top;
+    Padding: (Full: 20);
+    Background: #141c26;
+
+    Label {
+      Text: "Edit Character";
+      Anchor: (Height: 40);
+      Style: (
+        FontSize: 26,
+        RenderBold: true,
+        HorizontalAlignment: Center,
+        TextColor: #ffffff
+      );
+    }
+
+    $C.@ContentSeparator {
+      Anchor: (Height: 1);
+    }
+
+    Group { Anchor: (Height: 10); }
+
+    Label {
+      Text: "Name";
+      Anchor: (Height: 24);
+      Style: (
+        FontSize: 18,
+        TextColor: #9fb3c8
+      );
+    }
+
+    TextField #NameInput {
+      Anchor: (Height: 40);
+      Background: $C.@InputBoxBackground;
+      Style: $C.@DefaultInputFieldStyle;
+      Padding: (Left: 8, Right: 8);
+    }
+
+    Group { Anchor: (Height: 20); }
+
+    Label {
+      Text: "Description";
+      Anchor: (Height: 24);
+      Style: (
+        FontSize: 18,
+        TextColor: #9fb3c8
+      );
+    }
+
+    TextField #DescInput {
+      Anchor: (Height: 40);
+      Background: $C.@InputBoxBackground;
+      Style: $C.@DefaultInputFieldStyle;
+      Padding: (Left: 8, Right: 8);
+    }
+
+    Group { Anchor: (Height: 20); }
+
+    Group {
+      LayoutMode: Center;
+      Anchor: (Height: 44);
+
+      $C.@TextButton #SaveBtn {
+        @Text = "Save";
+        Anchor: (Width: 160, Height: 44);
+      }
+
+      Group { Anchor: (Width: 12); }
+
+      $C.@SecondaryTextButton #DeleteBtn {
+        @Text = "Delete";
+        Anchor: (Width: 160, Height: 44);
+      }
+
+      Group { Anchor: (Width: 12); }
+
+      $C.@CancelTextButton #CancelBtn {
+        @Text = "Cancel";
+        Anchor: (Width: 160, Height: 44);
+      }
+    }
+  }
+}

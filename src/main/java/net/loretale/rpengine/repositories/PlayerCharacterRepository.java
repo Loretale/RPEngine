@@ -220,11 +220,12 @@ public class PlayerCharacterRepository extends Repository {
         }
     }
 
-    public void createCharacter(UUID playerId, String name) {
+    public PlayerCharacter createCharacter(UUID playerId, String name) {
         String sql = """
         INSERT INTO player_characters (
             id, player_id, type, name, lives, chat_color
         ) VALUES (?, ?, ?::character_type, ?, ?, ?)
+        RETURNING *
     """;
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -235,7 +236,10 @@ public class PlayerCharacterRepository extends Repository {
             ps.setInt(5, 3); // default lives
             ps.setInt(6, Color.GRAY.getRGB());
 
-            ps.executeUpdate();
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+
+            return mapCharacter(rs);
         } catch (SQLException e) {
             throw new DataAccessException("Failed to create character", e);
         }

@@ -18,5 +18,5 @@
     },
     "DisabledByDefault": false,
     "Main": "net.loretale.rpengine.RPEngine",
-    "IncludesAssetPack": false
+    "IncludesAssetPack": true
 }

@@ -1,0 +1,32 @@
+$C = "../Common.ui";
+
+Group #CharacterRow {
+  LayoutMode: Left;
+  Anchor: (Height: 48);
+  Padding: (Left: 12, Right: 12, Top: 6, Bottom: 6);
+  Background: $C.@InputBoxBackground;
+
+  Label #CharacterName {
+    FlexWeight: 1;
+    Text: "Character";
+    Style: (
+      FontSize: 28,
+      RenderBold: true,
+      TextColor: #ffffff
+    );
+  }
+
+  $C.@TextButton #SwitchBtn {
+    Anchor: (Height: 32);
+    Text: "Switch";
+  }
+
+  Group { Anchor: (Width: 12); }
+
+  $C.@TextButton #EditBtn {
+    Anchor: (Height: 32);
+    Text: "Edit";
+  }
+
+  Group { Anchor: (Width: 12); }
+}
