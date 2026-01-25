@@ -22,6 +22,8 @@ public class RPEngine extends JavaPlugin {
 
     private static RPEngine instance;
 
+    private static Config<DatabaseConfig> DbConfig;
+
     public static RPEngine getInstance() {
         return instance;
     }
@@ -31,12 +33,7 @@ public class RPEngine extends JavaPlugin {
 
         instance = this;
 
-        //Config<DatabaseConfig> databaseConfig = this.withConfig("Database", DatabaseConfig.CODEC);
-        Database.init(
-                "jdbc:postgresql://localhost:5432/loretale", //databaseConfig.get().getUrl(),
-                "dev", //databaseConfig.get().getUsername(),
-                "devpassword" //databaseConfig.get().getPassword()
-        );
+        DbConfig = this.withConfig("Database", DatabaseConfig.CODEC);
 
         LOGGER.atInfo().log("Starting " + this.getName() + " version " + this.getManifest().getVersion().toString());
     }
@@ -44,6 +41,18 @@ public class RPEngine extends JavaPlugin {
     @Override
     protected void setup() {
         LOGGER.atInfo().log("Setting up plugin " + this.getName());
+
+        DbConfig.save();
+
+        try {
+            Database.init(
+                    DbConfig.get().getUrl(),
+                    DbConfig.get().getUsername(),
+                    DbConfig.get().getPassword()
+            );
+        } catch (SQLException e) {
+            throw new RuntimeException("Couldn't load DB", e);
+        }
 
         registerEvents();
         registerCommands();
