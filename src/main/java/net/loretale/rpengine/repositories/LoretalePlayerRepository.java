@@ -1,8 +1,5 @@
 package net.loretale.rpengine.repositories;
 
-import net.loretale.rpengine.model.PlayerCharacter;
-
-import javax.annotation.Nullable;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -147,6 +144,46 @@ public class LoretalePlayerRepository extends Repository {
             return null;
         } catch (SQLException e) {
             throw new DataAccessException("Failed to find player id from hytale user", e);
+        }
+    }
+
+    public boolean createPlayerFromAcceptedApplication(
+            UUID hytaleUserId,
+            String username
+    ) {
+        String sql = """
+        WITH accepted_app AS (
+            SELECT user_id AS discord_id, username
+            FROM applications
+            WHERE status = 'ACCEPTED'
+              AND LOWER(username) = LOWER(?)
+        ),
+        new_player AS (
+            INSERT INTO loretale_players DEFAULT VALUES
+            SELECT 1 FROM accepted_app
+            RETURNING id
+        ),
+        insert_hytale_user AS (
+            INSERT INTO hytale_users (id, player_id, name)
+            SELECT ?, new_player.id, accepted_app.username
+            FROM new_player
+            JOIN accepted_app ON TRUE
+        )
+        INSERT INTO discord_ids (player_id, discord_id)
+        SELECT new_player.id, accepted_app.discord_id
+        FROM new_player
+        JOIN accepted_app ON TRUE;
+        """;
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, username);
+            ps.setObject(2, hytaleUserId);
+
+            int affected = ps.executeUpdate();
+            return affected > 0;
+
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to create player from accepted application", e);
         }
     }
 }

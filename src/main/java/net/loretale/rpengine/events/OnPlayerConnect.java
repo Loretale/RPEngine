@@ -11,15 +11,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public class OnPlayerConnect {
-    private static final Set<String> TEST_PLAYERS = Set.of("muse", "_luca", "laplus", "pank");
-
     public static void onPlayerConnectEvent(PlayerConnectEvent event) {
         PlayerRef player = event.getPlayerRef();
-
-        if (!TEST_PLAYERS.contains(player.getUsername().toLowerCase())) {
-            player.getPacketHandler().disconnect("We're currently still under construction. Join us on discord https://discord.gg/FrKGmZf83V to apply to play when we launch.");
-            return;
-        }
 
         Optional<ActiveBanInfo> activeBan = Database.getLoretalePlayerRepository().getActiveBanReason(player.getUuid());
 
@@ -41,7 +34,9 @@ public class OnPlayerConnect {
             return;
         }
 
-        if (!Database.getLoretalePlayerRepository().exists(player.getUuid())) {
+        if (!Database.getLoretalePlayerRepository().exists(player.getUuid())
+            && !Database.getLoretalePlayerRepository()
+                .createPlayerFromAcceptedApplication(player.getUuid(), player.getUsername())) {
             player.getPacketHandler().disconnect("You are not whitelisted. Join us on discord https://discord.gg/FrKGmZf83V to apply.");
             return;
         }
