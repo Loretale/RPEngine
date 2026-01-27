@@ -2,6 +2,7 @@ package net.loretale.rpengine.commands;
 
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
+import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
@@ -17,6 +18,7 @@ public class CharacterCommand extends AbstractPlayerCommand {
 
     public CharacterCommand() {
         super("character", "Open character management UI");
+        setPermissionGroup(GameMode.Adventure);
     }
 
     @Override
