@@ -151,40 +151,79 @@ public class LoretalePlayerRepository extends Repository {
             UUID hytaleUserId,
             String username
     ) {
-        String sql = """
-        WITH accepted_app AS (
-            SELECT user_id AS discord_id, username
-            FROM applications
-            WHERE status = 'ACCEPTED'
-              AND LOWER(username) = LOWER(?)
-        ),
-        new_player AS (
-            INSERT INTO loretale_players DEFAULT VALUES
-            SELECT 1 FROM accepted_app
-            RETURNING id
-        ),
-        insert_hytale_user AS (
-            INSERT INTO hytale_users (id, player_id, name)
-            SELECT ?, new_player.id, accepted_app.username
-            FROM new_player
-            JOIN accepted_app ON TRUE
-        )
-        INSERT INTO discord_ids (player_id, discord_id)
-        SELECT new_player.id, accepted_app.discord_id
-        FROM new_player
-        JOIN accepted_app ON TRUE;
-        """;
+        try {
+            connection.setAutoCommit(false);
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, username);
-            ps.setObject(2, hytaleUserId);
+            String discordId;
+            String dbUsername;
 
-            int affected = ps.executeUpdate();
-            return affected > 0;
+            try (PreparedStatement ps = connection.prepareStatement("""
+                SELECT user_id, username
+                FROM applications
+                WHERE status = 'ACCEPTED'
+                AND LOWER(username) = LOWER(?)
+                LIMIT 1
+                """)) {
+                ps.setString(1, username);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (!rs.next()) {
+                        connection.rollback();
+                        return false;
+                    }
+                    discordId = rs.getString("user_id");
+                    dbUsername = rs.getString("username");
+                }
+            }
+
+            UUID playerId;
+
+            try (PreparedStatement ps = connection.prepareStatement("""
+                INSERT INTO loretale_players DEFAULT VALUES
+                RETURNING id
+                """)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    rs.next();
+                    playerId = rs.getObject("id", UUID.class);
+                }
+            }
+
+            try (PreparedStatement ps = connection.prepareStatement("""
+                INSERT INTO hytale_users (id, player_id, name)
+                VALUES (?, ?, ?)
+                """)) {
+                ps.setObject(1, hytaleUserId);
+                ps.setObject(2, playerId);
+                ps.setString(3, dbUsername);
+                ps.executeUpdate();
+            }
+
+            try (PreparedStatement ps = connection.prepareStatement("""
+                INSERT INTO discord_ids (player_id, discord_id)
+                VALUES (?, ?)
+                """)) {
+                ps.setObject(1, playerId);
+                ps.setString(2, discordId);
+                ps.executeUpdate();
+            }
+
+            connection.commit();
+            return true;
 
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to create player from accepted application", e);
+            try {
+                connection.rollback();
+            } catch (SQLException ignored) {}
+            throw new DataAccessException(
+                    "Failed to create player from accepted application",
+                    e
+            );
+        } finally {
+            try {
+                connection.setAutoCommit(true);
+            } catch (SQLException ignored) {}
         }
     }
+
 }
 

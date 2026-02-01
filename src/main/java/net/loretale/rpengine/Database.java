@@ -29,6 +29,10 @@ public class Database {
     }
 
     public static void init(String url, String username, String password) throws SQLException {
+        try { Class.forName("org.postgresql.Driver"); } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         connection = DriverManager.getConnection(url, username, password);
 
         MigrationManager.migrate(connection);

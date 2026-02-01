@@ -52,7 +52,8 @@ javadoc {
     options.addStringOption('Xdoclint:-missing', '-quiet')
 }
 
-tasks.register('hytale', ShadowJar) {
+tasks.withType(ShadowJar).configureEach {
+    mergeServiceFiles()
 }
 
 // Adds the Hytale server as a build dependency, allowing you to reference and
