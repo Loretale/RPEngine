@@ -8,14 +8,12 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class LoretalePlayerRepository extends Repository {
-    public LoretalePlayerRepository(Connection connection) {
-        super(connection);
-    }
+    public LoretalePlayerRepository() { }
 
     public boolean exists(UUID playerId) {
         String sql = "SELECT 1 FROM hytale_users WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             return ps.executeQuery().next();
         } catch (SQLException e) {
@@ -35,7 +33,7 @@ public class LoretalePlayerRepository extends Repository {
                 LIMIT 1
                 """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             ResultSet rs = ps.executeQuery();
 
@@ -62,7 +60,7 @@ public class LoretalePlayerRepository extends Repository {
                 AND hu.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -79,7 +77,7 @@ public class LoretalePlayerRepository extends Repository {
             WHERE h.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             ResultSet rs = ps.executeQuery();
 
@@ -106,7 +104,7 @@ public class LoretalePlayerRepository extends Repository {
                 AND hu.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, characterId);
             ps.setObject(2, hytaleUserId);
             ps.executeUpdate();
@@ -124,7 +122,7 @@ public class LoretalePlayerRepository extends Repository {
                 AND hu.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, hytaleUserId);
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -135,7 +133,7 @@ public class LoretalePlayerRepository extends Repository {
     public UUID getPlayerIdFromHytaleUser(UUID hytaleUserId) {
         String sql = "SELECT player_id FROM hytale_users WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, hytaleUserId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
@@ -152,12 +150,12 @@ public class LoretalePlayerRepository extends Repository {
             String username
     ) {
         try {
-            connection.setAutoCommit(false);
+            getConnection().setAutoCommit(false);
 
             String discordId;
             String dbUsername;
 
-            try (PreparedStatement ps = connection.prepareStatement("""
+            try (PreparedStatement ps = getConnection().prepareStatement("""
                 SELECT user_id, username
                 FROM applications
                 WHERE status = 'ACCEPTED'
@@ -168,7 +166,7 @@ public class LoretalePlayerRepository extends Repository {
 
                 try (ResultSet rs = ps.executeQuery()) {
                     if (!rs.next()) {
-                        connection.rollback();
+                        getConnection().rollback();
                         return false;
                     }
                     discordId = rs.getString("user_id");
@@ -178,7 +176,7 @@ public class LoretalePlayerRepository extends Repository {
 
             UUID playerId;
 
-            try (PreparedStatement ps = connection.prepareStatement("""
+            try (PreparedStatement ps = getConnection().prepareStatement("""
                 INSERT INTO loretale_players DEFAULT VALUES
                 RETURNING id
                 """)) {
@@ -188,7 +186,7 @@ public class LoretalePlayerRepository extends Repository {
                 }
             }
 
-            try (PreparedStatement ps = connection.prepareStatement("""
+            try (PreparedStatement ps = getConnection().prepareStatement("""
                 INSERT INTO hytale_users (id, player_id, name)
                 VALUES (?, ?, ?)
                 """)) {
@@ -198,7 +196,7 @@ public class LoretalePlayerRepository extends Repository {
                 ps.executeUpdate();
             }
 
-            try (PreparedStatement ps = connection.prepareStatement("""
+            try (PreparedStatement ps = getConnection().prepareStatement("""
                 INSERT INTO discord_ids (player_id, discord_id)
                 VALUES (?, ?)
                 """)) {
@@ -207,12 +205,12 @@ public class LoretalePlayerRepository extends Repository {
                 ps.executeUpdate();
             }
 
-            connection.commit();
+            getConnection().commit();
             return true;
 
         } catch (SQLException e) {
             try {
-                connection.rollback();
+                getConnection().rollback();
             } catch (SQLException ignored) {}
             throw new DataAccessException(
                     "Failed to create player from accepted application",
@@ -220,7 +218,7 @@ public class LoretalePlayerRepository extends Repository {
             );
         } finally {
             try {
-                connection.setAutoCommit(true);
+                getConnection().setAutoCommit(true);
             } catch (SQLException ignored) {}
         }
     }

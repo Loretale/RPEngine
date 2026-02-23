@@ -15,9 +15,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class PlayerCharacterRepository extends Repository {
-    public PlayerCharacterRepository(Connection connection) {
-        super(connection);
-    }
+    public PlayerCharacterRepository() { }
 
     private PlayerCharacter mapCharacter(ResultSet rs) throws SQLException {
         PlayerCharacter c = new PlayerCharacter();
@@ -49,7 +47,7 @@ public class PlayerCharacterRepository extends Repository {
             WHERE hu.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             ResultSet rs = ps.executeQuery();
 
@@ -69,7 +67,7 @@ public class PlayerCharacterRepository extends Repository {
             WHERE hu.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             ResultSet rs = ps.executeQuery();
 
@@ -93,7 +91,7 @@ public class PlayerCharacterRepository extends Repository {
                 AND pc.lives > 0
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, playerId);
             ResultSet rs = ps.executeQuery();
 
@@ -112,7 +110,7 @@ public class PlayerCharacterRepository extends Repository {
     public Optional<PlayerCharacter> getById(UUID characterId) {
         String sql = "SELECT * FROM player_characters WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, characterId);
             ResultSet rs = ps.executeQuery();
 
@@ -127,7 +125,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateName(UUID characterId, String name) {
         String sql = "UPDATE player_characters SET name = ? WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, name);
             ps.setObject(2, characterId);
             ps.executeUpdate();
@@ -139,7 +137,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateGender(UUID characterId, @Nullable Gender gender) {
         String sql = "UPDATE player_characters SET gender = ?::gender WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             if (gender == null) {
                 ps.setNull(1, Types.VARCHAR);
             } else {
@@ -155,7 +153,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateBirthDate(UUID characterId, long birthDate) {
         String sql = "UPDATE player_characters SET birth_date = ? WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setLong(1, birthDate);
             ps.setObject(2, characterId);
             ps.executeUpdate();
@@ -167,7 +165,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateRace(UUID characterId, @Nullable Race race) {
         String sql = "UPDATE player_characters SET race = ?::race WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             if (race == null) {
                 ps.setNull(1, Types.VARCHAR);
             } else {
@@ -183,7 +181,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateDescription(UUID characterId, @Nullable String description) {
         String sql = "UPDATE player_characters SET description = ? WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             if (description == null) {
                 ps.setNull(1, Types.VARCHAR);
             } else {
@@ -199,7 +197,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateLives(UUID characterId, int lives) {
         String sql = "UPDATE player_characters SET lives = ? WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, lives);
             ps.setObject(2, characterId);
             ps.executeUpdate();
@@ -211,7 +209,7 @@ public class PlayerCharacterRepository extends Repository {
     public void updateChatColor(UUID characterId, Color chatColor) {
         String sql = "UPDATE player_characters SET chat_color = ? WHERE id = ?";
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setInt(1, chatColor.getRGB());
             ps.setObject(2, characterId);
             ps.executeUpdate();
@@ -228,7 +226,7 @@ public class PlayerCharacterRepository extends Repository {
         RETURNING *
     """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, UUID.randomUUID());
             ps.setObject(2, Database.getLoretalePlayerRepository().getPlayerIdFromHytaleUser(playerId));
             ps.setString(3, CharacterType.Player.name());

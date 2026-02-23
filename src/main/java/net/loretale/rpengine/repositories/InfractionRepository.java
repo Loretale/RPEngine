@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 public class InfractionRepository extends Repository {
-    public InfractionRepository(Connection connection) {
-        super(connection);
-    }
+    public InfractionRepository() { }
 
     private Infraction mapInfraction(ResultSet rs) throws SQLException {
         Infraction infraction = new Infraction();
@@ -38,7 +36,7 @@ public class InfractionRepository extends Repository {
             ORDER BY i.start DESC
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setObject(1, hytaleUserId);
             ResultSet rs = ps.executeQuery();
 
@@ -67,7 +65,7 @@ public class InfractionRepository extends Repository {
             WHERE hu.id = ?
         """;
 
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+        try (PreparedStatement ps = getConnection().prepareStatement(sql)) {
             ps.setString(1, type.name());
 
             if (end == null) {

@@ -10,6 +10,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class Database {
+    private static String url;
+    private static String username;
+    private static String password;
+
     private static Connection connection;
 
     private static InfractionRepository infractionRepository;
@@ -29,22 +33,26 @@ public class Database {
     }
 
     public static void init(String url, String username, String password) throws SQLException {
+        Database.url = url;
+        Database.username = username;
+        Database.password = password;
+
         try { Class.forName("org.postgresql.Driver"); } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        connection = DriverManager.getConnection(url, username, password);
+        connection = DriverManager.getConnection(Database.url, Database.username, Database.password);
 
         MigrationManager.migrate(connection);
 
-        infractionRepository = new InfractionRepository(connection);
-        loretalePlayerRepository = new LoretalePlayerRepository(connection);
-        playerCharacterRepository = new PlayerCharacterRepository(connection);
+        infractionRepository = new InfractionRepository();
+        loretalePlayerRepository = new LoretalePlayerRepository();
+        playerCharacterRepository = new PlayerCharacterRepository();
     }
 
-    public static Connection getConnection() {
-        if (connection == null) {
-            throw new IllegalStateException("Database not initialized");
+    public static Connection getConnection() throws SQLException {
+        if (connection == null || connection.isClosed() || !connection.isValid(5)) {
+            connection = DriverManager.getConnection(Database.url, Database.username, Database.password);
         }
         return connection;
     }

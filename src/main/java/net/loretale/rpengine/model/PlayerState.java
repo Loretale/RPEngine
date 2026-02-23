@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class PlayerState {
     private ChatChannel focusedChannel;
-    private final Set<ChatChannel> joinedChannels = EnumSet.allOf(ChatChannel.class);
+    private final Set<ChatChannel> joinedChannels = EnumSet.allOf(ChatChannel.class).clone();
     private @Nullable PlayerCharacter character;
     private PlayerRef player;
 

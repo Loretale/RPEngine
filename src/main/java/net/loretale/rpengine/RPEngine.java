@@ -7,12 +7,9 @@ import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
 import net.loretale.rpengine.commands.CharacterCommand;
-import net.loretale.rpengine.commands.ChatCommand;
 import net.loretale.rpengine.config.DatabaseConfig;
 import net.loretale.rpengine.events.OnPlayerChat;
 import net.loretale.rpengine.events.OnPlayerConnect;
-import net.loretale.rpengine.model.OnlinePlayerInfo;
-import net.loretale.rpengine.repositories.PlayerStateRepository;
 
 import javax.annotation.Nonnull;
 import java.sql.SQLException;
@@ -65,6 +62,5 @@ public class RPEngine extends JavaPlugin {
 
     private void registerCommands() {
         this.getCommandRegistry().registerCommand(new CharacterCommand());
-        this.getCommandRegistry().registerCommand(new ChatCommand());
     }
 }

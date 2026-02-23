@@ -1,11 +1,12 @@
 package net.loretale.rpengine.repositories;
 
+import net.loretale.rpengine.Database;
+
 import java.sql.Connection;
+import java.sql.SQLException;
 
 public abstract class Repository {
-    protected Connection connection;
-
-    public Repository(Connection connection) {
-        this.connection = connection;
+    protected Connection getConnection() throws SQLException {
+        return Database.getConnection();
     }
 }
